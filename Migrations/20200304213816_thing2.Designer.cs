@@ -10,8 +10,8 @@ using ShopAPI.Models;
 namespace ShopAPI.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20200304183009_AddedHockeySticksTable")]
-    partial class AddedHockeySticksTable
+    [Migration("20200304213816_thing2")]
+    partial class thing2
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -34,6 +34,9 @@ namespace ShopAPI.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("text");
 
+                    b.Property<int?>("LocationId")
+                        .HasColumnType("integer");
+
                     b.Property<string>("Name")
                         .HasColumnType("text");
 
@@ -48,7 +51,37 @@ namespace ShopAPI.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("LocationId");
+
                     b.ToTable("HockeySticks");
+                });
+
+            modelBuilder.Entity("ShopAPI.Models.Location", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+
+                    b.Property<string>("Address")
+                        .HasColumnType("text");
+
+                    b.Property<string>("ManagerName")
+                        .HasColumnType("text");
+
+                    b.Property<string>("PhoneNumber")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Locations");
+                });
+
+            modelBuilder.Entity("ShopAPI.Models.HockeyStick", b =>
+                {
+                    b.HasOne("ShopAPI.Models.Location", "Location")
+                        .WithMany("Hockeysticks")
+                        .HasForeignKey("LocationId");
                 });
 #pragma warning restore 612, 618
         }

@@ -15,16 +15,16 @@ namespace ShopAPI.Controllers
   {
     public DatabaseContext db { get; set; } = new DatabaseContext();
 
-    [HttpGet]
-    public async Task<List<HockeyStick>> GetHockeySticks()
+    [HttpGet("{LocationId}")]
+    public async Task<List<HockeyStick>> GetHockeySticks(int locationId)
     {
-      return await db.HockeySticks.OrderBy(stick => stick.Id).ToListAsync();
+      return await db.HockeySticks.Where(stick => stick.LocationId == locationId).OrderBy(stick => stick.Id).ToListAsync();
     }
 
-    [HttpGet("{id}")]
-    public async Task<HockeyStick> GetSingleHockeyStick(int id)
+    [HttpGet("{id}/{LocationId}")]
+    public async Task<HockeyStick> GetSingleHockeyStick(int id, int locationid)
     {
-      return await db.HockeySticks.FirstOrDefaultAsync(stick => stick.Id == id);
+      return await db.HockeySticks.FirstOrDefaultAsync(stick => stick.Id == id && stick.LocationId == locationid);
     }
 
     [HttpGet("out")]

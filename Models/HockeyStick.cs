@@ -17,5 +17,9 @@ namespace ShopAPI.Models
     public decimal Price { get; set; }
 
     public DateTime DateOrdered { get; set; }
+
+    public int? LocationId { get; set; }
+
+    public Location Location { get; set; }
   }
 }
