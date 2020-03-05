@@ -1,7 +1,7 @@
-docker build -t sdg-sample-api-template .
+docker build -t sdg-hockey-sticks-image .
 
-docker tag sdg-sample-api-template registry.heroku.com/sdg-sample-api-template/web
+docker tag sdg-hockey-sticks-image registry.heroku.com/sdg-hockey-sticks/web
 
-docker push registry.heroku.com/sdg-sample-api-template/web
+docker push registry.heroku.com/sdg-hockey-sticks/web
 
-heroku container:release web -a sdg-sample-api-template
+heroku container:release web -a sdg-hockey-sticks
