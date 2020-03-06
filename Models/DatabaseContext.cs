@@ -11,6 +11,10 @@ namespace ShopAPI.Models
 
     public DbSet<Location> Locations { get; set; }
 
+    public DbSet<Order> Orders { get; set; }
+
+    public DbSet<HockeyStickOrder> HockeyStickOrders { get; set; }
+
     private string ConvertPostConnectionToConnectionString(string connection)
     {
       var _connection = connection.Replace("postgres://", String.Empty);

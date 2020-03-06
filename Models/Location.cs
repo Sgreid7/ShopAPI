@@ -16,5 +16,4 @@ namespace ShopAPI.Models
     public List<HockeyStick> Hockeysticks { get; set; } = new List<HockeyStick>();
   }
 
-
 }

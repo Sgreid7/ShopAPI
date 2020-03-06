@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace ShopAPI.Models
 {
@@ -18,8 +19,11 @@ namespace ShopAPI.Models
 
     public DateTime DateOrdered { get; set; }
 
+    // NAVIGATION PROPERTIES
     public int? LocationId { get; set; }
 
     public Location Location { get; set; }
+
+    public List<HockeyStickOrder> HockeyStickOrders { get; set; }
   }
 }
