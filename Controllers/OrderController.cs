@@ -22,22 +22,27 @@ namespace ShopAPI.Controllers
       return await db.Orders.OrderBy(o => o.PlacedAt).ToListAsync();
     }
 
-    [HttpPost]
-    public async Task<ActionResult<Order>> CreateOrder(List<HockeyStick> hockeySticks)
+    [HttpPost("{locationId}")]
+    public async Task<ActionResult<Order>> CreateOrder(List<HockeyStick> hockeySticks, int locationId)
     {
       // create order and save it
       var orderToAdd = new Order();
+      orderToAdd.LocationId = locationId;
       await db.Orders.AddAsync(orderToAdd);
       await db.SaveChangesAsync();
       var hockeyStickOrdersToAdd = new List<HockeyStickOrder>();
       // foreach hockey stick in the list create a disc order with stickId and orderId
       foreach (HockeyStick hs in hockeySticks)
       {
-        var hockeyStickOrderToAdd = new HockeyStickOrder();
-        hockeyStickOrderToAdd.OrderId = orderToAdd.Id;
-        hockeyStickOrderToAdd.HockeyStickId = hs.Id;
-        db.HockeyStickOrders.Add(hockeyStickOrderToAdd);
-        hockeyStickOrdersToAdd.Add(hockeyStickOrderToAdd);
+        var stick = await db.HockeySticks.FirstOrDefaultAsync(s => s.Id == hs.Id);
+        if (stick.NumberInStock > 0)
+        {
+          var hockeyStickOrderToAdd = new HockeyStickOrder();
+          hockeyStickOrderToAdd.OrderId = orderToAdd.Id;
+          hockeyStickOrderToAdd.HockeyStickId = hs.Id;
+          db.HockeyStickOrders.Add(hockeyStickOrderToAdd);
+          hockeyStickOrdersToAdd.Add(hockeyStickOrderToAdd);
+        }
       }
 
       orderToAdd.HockeyStickOrders = hockeyStickOrdersToAdd;
@@ -53,10 +58,35 @@ namespace ShopAPI.Controllers
         ContentType = "application/json",
         StatusCode = 200
       };
-
     }
 
+    // * * * * * GET ORDERS BY LOCATION
+    [HttpGet("view/{LocationId}")]
+    public async Task<ActionResult<List<Order>>> ViewOrdersInALocation(int locationId)
+    {
+      var orders = await db.Orders.Where(stick => stick.LocationId == locationId).ToListAsync();
+      return Ok(orders);
+    }
 
+    // * * * * * UPDATE AN ORDER BY ID
+    [HttpPut("{id}")]
+    public async Task<ActionResult<Order>> UpdateOrders(int id, Order newData)
+    {
+      newData.Id = id;
+      db.Entry(newData).State = EntityState.Modified;
+      await db.SaveChangesAsync();
+      return newData;
+    }
+
+    // * * * * * DELETE AN ORDER BY ID
+    [HttpDelete("{id}")]
+    public async Task<ActionResult> DeleteOrderById(int id)
+    {
+      var orderToDelete = await db.Orders.FirstOrDefaultAsync(o => o.Id == id);
+      db.Orders.Remove(orderToDelete);
+      await db.SaveChangesAsync();
+      return Ok(new { text = "Order successfully removed!" });
+    }
 
   }
 }

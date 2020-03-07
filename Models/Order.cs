@@ -9,6 +9,10 @@ namespace ShopAPI.Models
 
     public DateTime PlacedAt { get; set; } = DateTime.Now;
 
+    public int LocationId { get; set; }
+
+    public Location Location { get; set; }
+
     // NAVIGATION
     public List<HockeyStickOrder> HockeyStickOrders { get; set; } = new List<HockeyStickOrder>();
 

@@ -24,6 +24,6 @@ namespace ShopAPI.Models
 
     public Location Location { get; set; }
 
-    public List<HockeyStickOrder> HockeyStickOrders { get; set; }
+    public List<HockeyStickOrder> HockeyStickOrders { get; set; } = new List<HockeyStickOrder>();
   }
 }

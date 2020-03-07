@@ -104,10 +104,15 @@ namespace ShopAPI.Migrations
                         .HasColumnType("integer")
                         .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
+                    b.Property<int>("LocationId")
+                        .HasColumnType("integer");
+
                     b.Property<DateTime>("PlacedAt")
                         .HasColumnType("timestamp without time zone");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("LocationId");
 
                     b.ToTable("Orders");
                 });
@@ -130,6 +135,15 @@ namespace ShopAPI.Migrations
                     b.HasOne("ShopAPI.Models.Order", "Order")
                         .WithMany("HockeyStickOrders")
                         .HasForeignKey("OrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("ShopAPI.Models.Order", b =>
+                {
+                    b.HasOne("ShopAPI.Models.Location", "Location")
+                        .WithMany()
+                        .HasForeignKey("LocationId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
