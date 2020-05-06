@@ -10,7 +10,7 @@ using ShopAPI.Models;
 namespace ShopAPI.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20200306225027_AddedTablesBackIn")]
+    [Migration("20200307200312_AddedTablesBackIn")]
     partial class AddedTablesBackIn
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

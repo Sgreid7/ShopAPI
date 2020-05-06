@@ -68,7 +68,7 @@ namespace ShopAPI.Controllers
     [HttpDelete("location/{LocationId}/{id}")]
     public async Task<ActionResult> DeleteHockeyStick(int id, int locationId)
     {
-      var hockeyStick = await db.HockeySticks.FirstOrDefaultAsync(stick => stick.Id == id && stick.LocationId == locationId);
+      var hockeyStick = await db.HockeySticks.FirstOrDefaultAsync(stick => stick.Id == id);
       db.HockeySticks.Remove(hockeyStick);
       await db.SaveChangesAsync();
       return Ok();

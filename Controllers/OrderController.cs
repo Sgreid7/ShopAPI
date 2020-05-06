@@ -22,42 +22,97 @@ namespace ShopAPI.Controllers
       return await db.Orders.OrderBy(o => o.PlacedAt).ToListAsync();
     }
 
-    [HttpPost("{locationId}")]
-    public async Task<ActionResult<Order>> CreateOrder(List<HockeyStick> hockeySticks, int locationId)
+    // [HttpPost("{locationId}")]
+    // public async Task<ActionResult<List<Order>>> CreateOrder(List<HockeyStick> hockeySticks, int hockeyStickId, int locationId)
+    // {
+    //   // create order and save it
+    //   var orderToAdd = new Order();
+    //   orderToAdd.LocationId = locationId;
+    //   await db.Orders.AddRangeAsync(orderToAdd);
+    //   await db.AddRangeAsync();
+    //   // await db.SaveChangesAsync();
+    //   var hockeyStickOrdersToAdd = new List<HockeyStickOrder>();
+    //   // foreach hockey stick in the list create a disc order with stickId and orderId
+    //   var stick = await db.HockeySticks.FirstOrDefaultAsync(s => s.Id == hockeyStickId);
+    //   if (stick.NumberInStock > 0)
+    //   {
+    //     var hockeyStickOrderToAdd = new HockeyStickOrder();
+    //     hockeyStickOrderToAdd.OrderId = orderToAdd.Id;
+    //     hockeyStickOrderToAdd.HockeyStickId = stick.Id;
+    //     db.HockeyStickOrders.Add(hockeyStickOrderToAdd);
+    //     await db.SaveChangesAsync();
+    //     hockeyStickOrdersToAdd.Add(hockeyStickOrderToAdd);
+
+    //   }
+    //   orderToAdd.HockeyStickOrders = hockeyStickOrdersToAdd;
+    //   await db.SaveChangesAsync();
+
+    //   return new ContentResult()
+    //   {
+    //     Content = JsonConvert.SerializeObject(orderToAdd,
+    //       new JsonSerializerSettings
+    //       {
+    //         ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+    //       }),
+    //     ContentType = "application/json",
+    //     StatusCode = 200
+    //   };
+    // }
+
+    // [HttpPost("{hockeyStickId}")]
+    // public async Task<ActionResult<List<Order>>> CreateNewOrder(Order order, int hockeyStickId, int locationId)
+    // {
+    //   var stick = db.HockeySticks.FirstOrDefault(s => s.Id == hockeyStickId);
+    //   if (stick.NumberInStock < 1)
+    //   {
+    //     return Ok(new { message = "That item is not in stock" });
+    //   }
+    //   else
+    //   {
+    //     var itemOrder = new HockeyStickOrder
+    //     {
+    //       HockeyStickId = hockeyStickId
+    //     };
+    //     await db.HockeyStickOrders.AddAsync(order);
+    //     await db.SaveChangesAsync();
+    //     order.HockeyStickOrders = null;
+    //     return Ok(order);
+    //     // return new ContentResult()
+    //     // {
+    //     //   Content = JsonConvert.SerializeObject(itemOrder,
+    //     //   new JsonSerializerSettings
+    //     //   {
+    //     //     ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+    //     //   }),
+    //     //   ContentType = "application/json",
+    //     //   StatusCode = 200
+    //     // };
+    //   }
+    // }
+
+    [HttpPost]
+    public async Task<ActionResult<List<Order>>> CreateNewOrder(Order order, int hockeyStickId)
     {
-      // create order and save it
-      var orderToAdd = new Order();
-      orderToAdd.LocationId = locationId;
-      await db.Orders.AddAsync(orderToAdd);
-      await db.SaveChangesAsync();
-      var hockeyStickOrdersToAdd = new List<HockeyStickOrder>();
-      // foreach hockey stick in the list create a disc order with stickId and orderId
-      foreach (HockeyStick hs in hockeySticks)
+      var itemInStock = db.HockeySticks.FirstOrDefault(i => i.Id == hockeyStickId);
+      if (itemInStock.NumberInStock < 1)
       {
-        var stick = await db.HockeySticks.FirstOrDefaultAsync(s => s.Id == hs.Id);
-        if (stick.NumberInStock > 0)
-        {
-          var hockeyStickOrderToAdd = new HockeyStickOrder();
-          hockeyStickOrderToAdd.OrderId = orderToAdd.Id;
-          hockeyStickOrderToAdd.HockeyStickId = hs.Id;
-          db.HockeyStickOrders.Add(hockeyStickOrderToAdd);
-          hockeyStickOrdersToAdd.Add(hockeyStickOrderToAdd);
-        }
+        return Ok(new { message = "That item is not in stock" });
       }
-
-      orderToAdd.HockeyStickOrders = hockeyStickOrdersToAdd;
-      await db.SaveChangesAsync();
-
-      return new ContentResult()
+      else
       {
-        Content = JsonConvert.SerializeObject(orderToAdd,
-          new JsonSerializerSettings
-          {
-            ReferenceLoopHandling = ReferenceLoopHandling.Ignore
-          }),
-        ContentType = "application/json",
-        StatusCode = 200
-      };
+        await db.Orders.AddAsync(order);
+        await db.SaveChangesAsync();
+        var orderId = order.Id;
+        var itemOrder = new HockeyStickOrder
+        {
+          OrderId = orderId,
+          HockeyStickId = hockeyStickId
+        };
+        await db.HockeyStickOrders.AddAsync(itemOrder);
+        await db.SaveChangesAsync();
+        order.HockeyStickOrders = null;
+        return Ok(order);
+      }
     }
 
     // * * * * * GET ORDERS BY LOCATION
@@ -79,10 +134,10 @@ namespace ShopAPI.Controllers
     }
 
     // * * * * * DELETE AN ORDER BY ID
-    [HttpDelete("{id}")]
-    public async Task<ActionResult> DeleteOrderById(int id)
+    [HttpDelete("{locationId}/{id}")]
+    public async Task<ActionResult> DeleteOrderById(int id, int locationId)
     {
-      var orderToDelete = await db.Orders.FirstOrDefaultAsync(o => o.Id == id);
+      var orderToDelete = await db.Orders.FirstOrDefaultAsync(o => o.Id == id && o.LocationId == locationId);
       db.Orders.Remove(orderToDelete);
       await db.SaveChangesAsync();
       return Ok(new { text = "Order successfully removed!" });
